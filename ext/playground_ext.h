@@ -29,10 +29,6 @@
 	\brief Test of the Qt-based viewer widget
 */
 
-//using namespace Enki;
-//using namespace std;
-//using namespace nzmqt;
-
 namespace Enki
 {
 
@@ -87,7 +83,10 @@ public:
         connect(socket_, SIGNAL(messageReceived(const QList<QByteArray>&)),
                 SLOT(messageReceived(const QList<QByteArray>&)));
 
-		qDebug() << "Getting somewhere...";	
+        socket_->subscribeTo(topic_);
+        socket_->connectTo(address_);
+
+		//qDebug() << "Getting somewhere...";	
 	}
 	
 	void addDefaultsRobots(World *world)
@@ -158,9 +157,9 @@ public:
 
 protected slots:
     void messageReceived(const QList<QByteArray>& message)
-        {
+    {
             qDebug() << "Subscriber> " << message;
-        }
+    }
 };
 
 } // namespace Enki
