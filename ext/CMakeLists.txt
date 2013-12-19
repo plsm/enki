@@ -19,12 +19,13 @@ if (CMAKE_HOST_UNIX)
 	add_definitions("-fPIC")
 endif (CMAKE_HOST_UNIX)
 
-#add_definitions(-DNZMQT_LIB=1)
-#set(ext_test_SRCS playground_test.cpp nzmqt.cpp)
-set(ext_test_SRCS playground_test.cpp)
-set(ext_test_HEADERS playground_ext.h ${nzmqt_INCLUDE_DIR}/nzmqt/nzmqt.hpp)
+set(playground_ext_SOURCES playground_ext_main.cpp)
+set(test_client_SOURCES test_client.cpp)
 
-qt4_wrap_cpp(ext_test_HEADERS_MOC ${ext_test_HEADERS})
+# For MOC-ing
+set(ext_QT_HEADERS playground_ext.h ${nzmqt_INCLUDE_DIR}/nzmqt/nzmqt.hpp)
+
+qt4_wrap_cpp(ext_QT_HEADERS_MOC ${ext_QT_HEADERS})
 	
 include_directories (${enki_SOURCE_DIR} 
                      ${ZeroMQ_INCLUDE_DIR} 
@@ -33,10 +34,10 @@ include_directories (${enki_SOURCE_DIR}
 
 link_directories (${enki_BINARY_DIR})   
 
-add_executable(spawn_server spawn_server.cpp)
-target_link_libraries(spawn_server enki ${ZeroMQ_LIBRARY})
+add_executable(test_client ${test_client_SOURCES})
+target_link_libraries(test_client ${ZeroMQ_LIBRARY})
 
-add_executable(playground_test ${ext_test_SRCS} ${ext_test_HEADERS_MOC})
-target_link_libraries(playground_test enkiviewer enki 
+add_executable(playground_ext ${playground_ext_SOURCES} ${ext_QT_HEADERS_MOC})
+target_link_libraries(playground_ext enkiviewer enki 
                       ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ZeroMQ_LIBRARY})
  

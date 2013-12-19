@@ -86,7 +86,7 @@ public:
         socket_->subscribeTo(topic_);
         socket_->connectTo(address_);
 
-		//qDebug() << "Getting somewhere...";	
+		qDebug() << "Listening on " << address_ << " for news about " << topic;	
 	}
 	
 	void addDefaultsRobots(World *world)
