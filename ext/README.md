@@ -1,4 +1,5 @@
-=== Installation ===
+Installation
+------------
 
 Dependencies:
 
@@ -7,7 +8,8 @@ Dependencies:
  * nzmqt (header-only) (3.2.2)
 
 
-=== TODO ===
+TODO
+----
 
 Change zmq integration. Right now, ZMQ is integrated directly into the Qt GUI through nzmqt.
 A Qt signal is emitted every time a ZMQ message comes in.
@@ -20,6 +22,7 @@ Update to Qt5
 
  * Update cmake: http://qt-project.org/doc/qt-5.0/qtdoc/cmake-manual.html
 
-=== NOTES ===
+NOTES
+-----
 
  * GUI stuff doesn't seem to work in debug mode
