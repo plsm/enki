@@ -71,9 +71,6 @@ public:
 			o->dryFrictionCoefficient = 0.;
 			world->addObject(o);
 		}
-		
-        // Add two e-pucks
-		addDefaultsRobots(world);
 
         // Open a ZMQ listener
         context_ = nzmqt::createDefaultContext(this);
@@ -89,21 +86,12 @@ public:
 		qDebug() << "Listening on " << address_ << " for news about " << topic;	
 	}
 	
-	void addDefaultsRobots(World *world)
-	{
-		EPuck *epuck = new EPuck;
-		epuck->pos = Point(60, 50);
-		//epuck->leftSpeed = 5;
-		//epuck->rightSpeed = 5;
-		world->addObject(epuck);
-		
-		epuck = new EPuck;
-		epuck->pos = Point(40, 50);
-		epuck->leftSpeed = 5;
-		epuck->rightSpeed = 5;
-		epuck->setColor(Color(1, 0, 0));
-		//world->addObject(epuck);
-	}
+    void addEPuck(World *world, Point pos)
+    {
+        EPuck *epuck = new EPuck;
+        epuck->pos = pos;
+        world->addObject(epuck);
+    }
 	
 	~EnkiPlayground()
 	{
@@ -158,7 +146,12 @@ public:
 protected slots:
     void messageReceived(const QList<QByteArray>& message)
     {
-            qDebug() << "Subscriber> " << message;
+        foreach ( const QByteArray &part, message )
+        {
+            QByteArray part_copy(part);
+            QList<QByteArray> arg_list = part_copy.split(' ');
+            addEPuck(world, Point(arg_list[2].toDouble(), arg_list[3].toDouble()));
+        }
     }
 };
 
