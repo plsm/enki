@@ -4,17 +4,21 @@
 
 #include "WorldExt.h"
 
+#include <unistd.h> // for usleep
+
 using std::string;
 
 int main(int argc, char *argv[])
 {
     double r = 120; // World radius (in cm?)
-    string protocol("tcp://"), address("*"), port(":5555"); 
-    Enki::WorldExt world(r, protocol, address, port);
-
+    string pub_address("tcp://127.0.0.1:5555"); 
+    string sub_address("tcp://127.0.0.1:5556");
+    Enki::WorldExt world(r, pub_address, sub_address);
+    Enki::World* wp = &world;
     while (1)
     {
-        world.step(0.1, 2);
+        wp->step(1, 20);
+        usleep(1000000);
     }
 
     return 0;

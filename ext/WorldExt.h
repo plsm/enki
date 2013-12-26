@@ -8,6 +8,8 @@
 #ifndef ENKI_WORLD_EXT_H
 #define ENKI_WORLD_EXT_H
 
+#include <zmq.hpp>
+
 #include "enki/PhysicalEngine.h"
 
 namespace Enki
@@ -30,9 +32,8 @@ namespace Enki
             \param port     Port to publish on/subscribe to...TODO
          */
         WorldExt(double r, 
-                 const std::string& protocol = "tcp://",
-                 const std::string& address = "*",
-                 const std::string& port = "5555",
+                 const std::string& pub_address = "tcp://127.0.0.1:5555",
+                 const std::string& sub_address = "tcp://127.0.0.1:5556",
                  const Color& wallsColor = Color::gray,
                  unsigned texWdith = 0,
                  unsigned texHeight = 0,
@@ -45,10 +46,12 @@ namespace Enki
         virtual void controlStep(double dt);
 
     private:
-        std::string protocol_;
-        std::string address_;
-        std::string port_;
+        std::string pub_address_;
+        std::string sub_address_;
         
+        zmq::context_t* context_;
+        zmq::socket_t* publisher_;
+        zmq::socket_t* subscriber_;
     };
 
 }
