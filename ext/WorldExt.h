@@ -8,9 +8,13 @@
 #ifndef ENKI_WORLD_EXT_H
 #define ENKI_WORLD_EXT_H
 
+#include <map>
+
 #include <zmq.hpp>
 
 #include "enki/PhysicalEngine.h"
+
+#include "ext/MessageHandler.h"
 
 namespace Enki
 {
@@ -24,14 +28,21 @@ namespace Enki
         
     public:
 
+//! Enki world extened with a ZMQ-based external interface.
+    /*! 
+        
+     */
+
         //! Construct a world with walls of radius r, start communication.
         /*!
-            \param protocol Communication protocol. Supports all protocol provided by ZMQ.
-                            Valid values are: "tcp://", "ipc://"
-            \param address  Address to publish on/subscribe to...TODO
-            \param port     Port to publish on/subscribe to...TODO
+            \param msg_handler Allocate it on the heap using "new".
+                               WorldExt takes ownership of the object 
+                               and deletes it in the destructor!
+            \param pub_address The publisher will be bound to this address.
+            \param sub_address The subscriber will connect to this address for data.
          */
         WorldExt(double r, 
+                 MessageHandler* msg_handler,
                  const std::string& pub_address = "tcp://127.0.0.1:5555",
                  const std::string& sub_address = "tcp://127.0.0.1:5556",
                  const Color& wallsColor = Color::gray,
@@ -46,6 +57,9 @@ namespace Enki
         virtual void controlStep(double dt);
 
     private:
+        MessageHandler* msg_handler_;
+
+        // ZMQ connection data members
         std::string pub_address_;
         std::string sub_address_;
         

@@ -1,7 +1,10 @@
 #Find dependencies
 find_package(ZeroMQ REQUIRED)
+# boost::any is required for the message parser
+find_package(Boost REQUIRED)
 
 set(test_ext_SOURCES WorldExt.cpp
+                     AssisiMessageHandler.cpp
                      TestWorldExt.cpp)
 
 set(simple_subscriber_SOURCES simple_subscriber.cpp)
@@ -38,6 +41,7 @@ if (QT4_FOUND)
 
     set(playground_ext_SOURCES PlaygroundExtMain.cpp
                                PlaygroundExt.cpp
+                               AssisiMessageHandler.cpp
                                WorldExt.cpp)
     
     # For MOC-ing
