@@ -34,8 +34,10 @@
 
 #include <QApplication>
 
-#include "playground_ext.h"
+#include "WorldExt.h"
+#include "PlaygroundExt.h"
 
+using std::string;
 
 // http://qtnode.net/wiki?title=Qt_with_cmake
 int main(int argc, char *argv[])
@@ -43,8 +45,10 @@ int main(int argc, char *argv[])
 	QApplication app(argc, argv);
 	
 	// Create the world and the viewer
-	//World world(120, 120, Color(0.9, 0.9, 0.9));
-    Enki::World world(120, Enki::Color(0.9, 0.9, 0.9));
+    double r = 120; // World radius (in cm?)
+    string pub_address("tcp://127.0.0.1:5555"); 
+    string sub_address("tcp://127.0.0.1:5556");
+    Enki::WorldExt world(r, pub_address, sub_address);
     Enki::EnkiPlayground viewer(&world);
 	
 	viewer.show();

@@ -31,17 +31,17 @@ if (QT4_FOUND)
     
     include(${QT_USE_FILE})
     add_definitions(${QT_DEFINITIONS})
-    
-    
-    
+        
     if (CMAKE_HOST_UNIX)
     	add_definitions("-fPIC")
     endif (CMAKE_HOST_UNIX)
-    
-    set(playground_ext_SOURCES playground_ext_main.cpp)
+
+    set(playground_ext_SOURCES PlaygroundExtMain.cpp
+                               PlaygroundExt.cpp
+                               WorldExt.cpp)
     
     # For MOC-ing
-    set(ext_QT_HEADERS playground_ext.h ${nzmqt_INCLUDE_DIR}/nzmqt/nzmqt.hpp)
+    set(ext_QT_HEADERS PlaygroundExt.h)
     
     qt4_wrap_cpp(ext_QT_HEADERS_MOC ${ext_QT_HEADERS})
     	
@@ -52,10 +52,10 @@ if (QT4_FOUND)
     
     link_directories (${enki_BINARY_DIR})   
     
-    add_executable(test_client ${test_client_SOURCES})
-    target_link_libraries(test_client ${ZeroMQ_LIBRARY})
-    
     add_executable(playground_ext ${playground_ext_SOURCES} ${ext_QT_HEADERS_MOC})
-    target_link_libraries(playground_ext enkiviewer enki 
-                          ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${ZeroMQ_LIBRARY})
+    target_link_libraries(playground_ext enki
+                                         enkiviewer
+                                         ${QT_LIBRARIES} 
+                                         ${OPENGL_LIBRARIES} 
+                                         ${ZeroMQ_LIBRARY})
 endif (QT4_FOUND)     
