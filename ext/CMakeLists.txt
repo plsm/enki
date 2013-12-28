@@ -4,12 +4,7 @@ find_package(ZeroMQ REQUIRED)
 find_package(Boost REQUIRED)
 
 set(test_ext_SOURCES WorldExt.cpp
-                     AssisiMessageHandler.cpp
                      TestWorldExt.cpp)
-
-set(simple_subscriber_SOURCES simple_subscriber.cpp)
-
-set(simple_publisher_SOURCES simple_publisher.cpp)
 
 include_directories (${enki_SOURCE_DIR}
                      ${ZeroMQ_INCLUDE_DIR})
@@ -18,12 +13,6 @@ link_directories (${enki_BINARY_DIR})
 
 add_executable(test_ext ${test_ext_SOURCES})
 target_link_libraries(test_ext enki ${ZeroMQ_LIBRARY})
-
-add_executable(simple_subscriber ${simple_subscriber_SOURCES})
-target_link_libraries(simple_subscriber ${ZeroMQ_LIBRARY})
-
-add_executable(simple_publisher ${simple_publisher_SOURCES})
-target_link_libraries(simple_publisher ${ZeroMQ_LIBRARY})
 
 find_package(Qt4)
 
@@ -41,7 +30,6 @@ if (QT4_FOUND)
 
     set(playground_ext_SOURCES PlaygroundExtMain.cpp
                                PlaygroundExt.cpp
-                               AssisiMessageHandler.cpp
                                WorldExt.cpp)
     
     # For MOC-ing
