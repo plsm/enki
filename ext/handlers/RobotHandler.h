@@ -6,12 +6,21 @@
 #ifndef ENKI_ROBOT_HANDLER_H
 #define ENKI_ROBOT_HANDLER_H
 
-#include <zmq.hpp>
+//#include <zmq.hpp>
 
-#include "enki/PhysicalEngine.h"
+//#include "enki/PhysicalEngine.h"
+
+// Forward declarations
+namespace zmq
+{
+    class message_t;
+}
 
 namespace Enki
 {
+
+    class Robot;
+
     //! Abstract base class, defines the message-handling interface for Enki
     /*! Users should implement their own message handling according for each robot type.
 
@@ -40,7 +49,7 @@ namespace Enki
         /*! Override this method to handle outgoing messages 
             for your particular robot.
          */
-        virtual int handleOutgoing(void) = 0;
+        virtual int handleOutgoing(zmq::message_t** out_msg) = 0;
     };
 
 }

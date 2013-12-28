@@ -3,6 +3,7 @@
  */
 
 #include "WorldExt.h"
+#include "ext/handlers/EPuckHandler.h"
 
 #include <unistd.h> // for usleep
 
@@ -14,6 +15,10 @@ int main(int argc, char *argv[])
     string pub_address("tcp://127.0.0.1:5555"); 
     string sub_address("tcp://127.0.0.1:5556");
     Enki::WorldExt world(r, pub_address, sub_address);
+
+    // Add handlers
+    EPuckHandler *eh = new EPuckHandler();
+    WorldExt.addHandler(eh);
     Enki::World* wp = &world;
     while (1)
     {

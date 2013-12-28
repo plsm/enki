@@ -14,7 +14,7 @@
 
 #include "enki/PhysicalEngine.h"
 
-#include "ext/RobotHandler.h"
+#include "ext/handlers/RobotHandler.h"
 
 namespace Enki
 {
@@ -51,10 +51,22 @@ namespace Enki
         //! Destructor
         virtual ~WorldExt();
 
+        //! Add robot handler.
+        /*! One handler should be added for each robot type
+            that will be made available through the external interface.
+
+            The WorldExt object takes ownership of the RobotHandler, i.e.,
+it must be created on the heap and should not be deleted!
+         */
+        bool addHandler(std::string type, RobotHandler* handler);
+
     protected:
         virtual void controlStep(double dt);
 
     private:
+
+        // Robot handlers
+        std::map<std::string, RobotHandler*> handlers_;
 
         // ZMQ connection data members
         std::string pub_address_;

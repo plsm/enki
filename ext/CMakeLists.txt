@@ -1,9 +1,11 @@
 #Find dependencies
 find_package(ZeroMQ REQUIRED)
-# boost::any is required for the message parser
+
+# boost::for_each is used within WorldExt
 find_package(Boost REQUIRED)
 
 set(test_ext_SOURCES WorldExt.cpp
+                     handlers/EPuckHandler.cpp
                      TestWorldExt.cpp)
 
 include_directories (${enki_SOURCE_DIR}
@@ -29,6 +31,7 @@ if (QT4_FOUND)
     endif (CMAKE_HOST_UNIX)
 
     set(playground_ext_SOURCES PlaygroundExtMain.cpp
+                               handlers/EPuckHandler.cpp
                                PlaygroundExt.cpp
                                WorldExt.cpp)
     
