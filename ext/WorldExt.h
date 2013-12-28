@@ -14,7 +14,7 @@
 
 #include "enki/PhysicalEngine.h"
 
-#include "ext/MessageHandler.h"
+#include "ext/RobotHandler.h"
 
 namespace Enki
 {
@@ -35,16 +35,14 @@ namespace Enki
 
         //! Construct a world with walls of radius r, start communication.
         /*!
-            \param msg_handler Allocate it on the heap using "new".
                                WorldExt takes ownership of the object 
                                and deletes it in the destructor!
             \param pub_address The publisher will be bound to this address.
             \param sub_address The subscriber will connect to this address for data.
          */
         WorldExt(double r, 
-                 MessageHandler* msg_handler,
-                 const std::string& pub_address = "tcp://127.0.0.1:5555",
-                 const std::string& sub_address = "tcp://127.0.0.1:5556",
+                 const std::string& pub_address,
+                 const std::string& sub_address,
                  const Color& wallsColor = Color::gray,
                  unsigned texWdith = 0,
                  unsigned texHeight = 0,
@@ -57,7 +55,6 @@ namespace Enki
         virtual void controlStep(double dt);
 
     private:
-        MessageHandler* msg_handler_;
 
         // ZMQ connection data members
         std::string pub_address_;
