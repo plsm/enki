@@ -6,11 +6,8 @@
 #ifndef ENKI_ROBOT_HANDLER_H
 #define ENKI_ROBOT_HANDLER_H
 
-//#include <zmq.hpp>
+#include <list>
 
-//#include "enki/PhysicalEngine.h"
-
-// Forward declarations
 namespace zmq
 {
     class message_t;
@@ -20,6 +17,8 @@ namespace Enki
 {
 
     class Robot;
+    
+    typedef std::list<zmq::message_t*> MessagePtrList;
 
     //! Abstract base class, defines the message-handling interface for Enki
     /*! Users should implement their own message handling according for each robot type.
@@ -36,7 +35,7 @@ namespace Enki
             robot type.
 
          */
-        virtual Robot* CreateRobot() = 0;
+        virtual Robot* createRobot(zmq::message_t* in_msg) = 0;
 
         //! Handle incoming message
         /*! Override this method to handle incoming messages
@@ -45,11 +44,15 @@ namespace Enki
          */
         virtual int handleIncoming(zmq::message_t* in_msg) = 0;
 
-        //! Handle outgoing message
-        /*! Override this method to handle outgoing messages 
+        //! Assemble outgoing messages
+        /*! Override this method to create outgoing messages 
             for your particular robot.
+
+            Ownership of the allocated messages is transfered
+            to the caller, i.e., the caller *must* call delete
+            on all messages!
          */
-        virtual int handleOutgoing(zmq::message_t** out_msg) = 0;
+        virtual int assembleOutgoing(MessagePtrList& out_msg) = 0;
     };
 
 }

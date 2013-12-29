@@ -7,11 +7,15 @@
 
 #include <boost/foreach.hpp>
 
+#include <zmq.hpp>
+
 #include "enki/robots/e-puck/EPuck.h"
 #include "ext/handlers/RobotHandler.h"
 #include "WorldExt.h"
 
 using std::string;
+using std::map;
+using zmq::message_t;
 
 namespace Enki
 {
@@ -41,10 +45,13 @@ namespace Enki
 
     WorldExt::~WorldExt()
     {
-        BOOST_FOREACH(std::pair<std::string, RobotHandler*> rh, handlers_)
+        // We own the handlers, so delete them
+        typedef map<string, RobotHandler*> handler_map;
+        BOOST_FOREACH(const handler_map::value_type& rh, handlers_)
         {
             delete rh.second;
         }
+
         delete subscriber_;
         delete publisher_;
         delete context_;
@@ -52,9 +59,9 @@ namespace Enki
 
 // -----------------------------------------------------------------------------
 
-    bool WorldExt::addHandler(std::string type, RobotHandler* handler)
+    bool WorldExt::addHandler(string type, RobotHandler* handler)
     {
-        if (handlers_.count() > 0)
+        if (handlers_.count(type) > 0)
         {
             return false;
         }
@@ -89,25 +96,25 @@ namespace Enki
                 handlers_.begin()->second->handleIncoming(&ctrl_msg);
             }
                 
-            std::cout << "Received: " << std::string(static_cast<char*>(ctrl_msg.data())) << std::endl;
+            std::cout << "Received: " << string(static_cast<char*>(ctrl_msg.data())) << std::endl;
             len = subscriber_->recv(&ctrl_msg, ZMQ_DONTWAIT);
         }
 
         // Publish sensor data
         int out_count = 0;
 
-        // Call handlers here!
-        zmq::message_t **pub_msgs;
+        // Gather messages from all handlers
+        MessagePtrList pub_msgs;
         if (handlers_.begin() != handlers_.end())
         {
-            out_count = handlers_.begin()->second->handleOutgoing(pub_msgs);
+            out_count += handlers_.begin()->second->assembleOutgoing(pub_msgs);
         }
-        for (int i = 0; i < out_count; i++)
+
+        // Send all outgoing messages
+        BOOST_FOREACH(message_t* msg, pub_msgs)
         {
-            publisher_->send(*pub_msgs[i]);
-            delete pub_msgs[i];
+            publisher_->send(*msg);
         }
-        delete pub_msgs;
     }
 
 // -----------------------------------------------------------------------------

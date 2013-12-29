@@ -33,7 +33,7 @@ namespace Enki
             delete it in the destructor.
 
          */
-        virtual Robot* createRobot(std::string name);
+        virtual Robot* createRobot(zmq::message_t* in_msg);
 
         //! Handle incoming message
         /*! Handles E-Puck motion commands.
@@ -41,10 +41,10 @@ namespace Enki
          */
         virtual int handleIncoming(zmq::message_t* in_msg);
 
-        //! Handle outgoing message
+        //! Assemble outgoing messages
         /*! Creates E-Puck sensor data messages.
          */
-        virtual int handleOutgoing(zmq::message_t** out_msg);
+        virtual int assembleOutgoing(MessagePtrList& out_msg);
 
     private:
         std::map<std::string, EPuck*> epucks_;
