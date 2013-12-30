@@ -6,20 +6,17 @@
 #ifndef ENKI_ROBOT_HANDLER_H
 #define ENKI_ROBOT_HANDLER_H
 
-#include <list>
 
 namespace zmq
 {
-    class message_t;
+    class socket_t;
 }
 
 namespace Enki
 {
-
+    class World;
     class Robot;
     
-    typedef std::list<zmq::message_t*> MessagePtrList;
-
     //! Abstract base class, defines the message-handling interface for Enki
     /*! Users should implement their own message handling according for each robot type.
 
@@ -35,24 +32,27 @@ namespace Enki
             robot type.
 
          */
-        virtual Robot* createRobot(zmq::message_t* in_msg) = 0;
+        virtual std::string createRobot(zmq::socket_t* sock, World* world) = 0;
 
         //! Handle incoming message
         /*! Override this method to handle incoming messages
             for your particular robot.
 
+            \arg sock The socket containing the message to be handled.
+                      It's a 0MQ multipart message, with the 
+                      first part(s) peeled off.
+
          */
-        virtual int handleIncoming(zmq::message_t* in_msg) = 0;
+        virtual int handleIncoming(zmq::socket_t* sock, std::string name) = 0;
 
         //! Assemble outgoing messages
         /*! Override this method to create outgoing messages 
             for your particular robot.
 
-            Ownership of the allocated messages is transfered
-            to the caller, i.e., the caller *must* call delete
-            on all messages!
+            \arg sock Outgoing messages are written to socket sock.
+            
          */
-        virtual int assembleOutgoing(MessagePtrList& out_msg) = 0;
+        virtual int sendOutgoing(zmq::socket_t* sock) = 0;
     };
 
 }

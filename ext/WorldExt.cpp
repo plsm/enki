@@ -8,14 +8,16 @@
 #include <boost/foreach.hpp>
 
 #include <zmq.hpp>
+#include "ext/zmq_helpers.h"
 
 #include "enki/robots/e-puck/EPuck.h"
 #include "ext/handlers/RobotHandler.h"
 #include "WorldExt.h"
 
-using std::string;
-using std::map;
-using zmq::message_t;
+
+using namespace std;
+using namespace zmq;
+
 
 namespace Enki
 {
@@ -33,12 +35,12 @@ namespace Enki
           pub_address_(pub_address), sub_address_(sub_address)
     {
         context_ = new zmq::context_t(1);
-        publisher_ = new zmq::socket_t(*context_, ZMQ_PUB);
-        subscriber_ = new zmq::socket_t(*context_, ZMQ_SUB);
+        publisher_ = new socket_t(*context_, ZMQ_PUB);
+        subscriber_ = new socket_t(*context_, ZMQ_SUB);
 
         publisher_->bind(pub_address_.c_str());
         subscriber_->connect(sub_address_.c_str());
-        subscriber_->setsockopt(ZMQ_SUBSCRIBE, "spawn", 5);
+        subscriber_->setsockopt(ZMQ_SUBSCRIBE, "sim", 3);
     }
 
 // -----------------------------------------------------------------------------
@@ -46,8 +48,7 @@ namespace Enki
     WorldExt::~WorldExt()
     {
         // We own the handlers, so delete them
-        typedef map<string, RobotHandler*> handler_map;
-        BOOST_FOREACH(const handler_map::value_type& rh, handlers_)
+        BOOST_FOREACH(const HandlerMap::value_type& rh, handlers_)
         {
             delete rh.second;
         }
@@ -78,43 +79,79 @@ namespace Enki
     {
         // TODO: Check if this update sequence is correct
 
-        // Read controller outputs & apply to robots
+        // Read all incoming messages & apply to robots
+        // Icoming messages represent controller outputs
         int in_count = 0;
 
-        zmq::message_t ctrl_msg;
-        int len = subscriber_->recv(&ctrl_msg, ZMQ_DONTWAIT);
+        message_t msg;
+        // Read message header
+        int len = subscriber_->recv(&msg, ZMQ_DONTWAIT);
         while (len > 0)
         {
             in_count++;
-            if (handlers_.begin() != handlers_.end())
+            string target = msg_to_str(msg);
+            // TODO: Implement "Sim handler" ???
+            // This message "peeling" is quite a pain...
+            if (target == "sim")
             {
-                Robot* rob = handlers_.begin()->second->createRobot(&ctrl_msg);
-                if (rob)
+                if (!last_part(*subscriber_))
                 {
-                    this->addObject(rob);
+                    // Read command
+                    subscriber_->recv(&msg);
+                    string sim_cmd = msg_to_str(msg);
+                    if (sim_cmd == "spawn")
+                    {
+                        // Command is spawn
+                        // Read command contents and spawn robot
+                        if (!last_part(*subscriber_))
+                        {
+                            subscriber_->recv(&msg);
+                            // TODO: Parse protobuf message here!
+                            string robot_type = "EPuck";
+                            if (handlers_.count(robot_type) > 0)
+                            {
+                                string name = handlers_[robot_type]->createRobot(subscriber_, this);
+                                if (name.length() > 0)
+                                {
+                                    // New robot was spawned
+                                    handlers_by_object_[name] = handlers_[robot_type];
+                                    subscriber_->setsockopt(ZMQ_SUBSCRIBE, name.c_str(), name.length());
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        cerr << "Unknown command to sim!" << std::endl;
+                    }
                 }
-                handlers_.begin()->second->handleIncoming(&ctrl_msg);
+                else
+                {
+                    cerr << "Missing message body for sim message!" << endl; 
+                }
+            }
+            else if (handlers_by_object_.count(target) > 0)
+            {
+                handlers_by_object_[target]->handleIncoming(subscriber_, target);
+            }
+            else
+            {
+                cerr << "Unknown object: " << target << endl;
             }
                 
-            std::cout << "Received: " << string(static_cast<char*>(ctrl_msg.data())) << std::endl;
-            len = subscriber_->recv(&ctrl_msg, ZMQ_DONTWAIT);
+            cout << "Received: " << string(static_cast<char*>(msg.data())) << std::endl;
+            len = subscriber_->recv(&msg, ZMQ_DONTWAIT);
         }
 
         // Publish sensor data
         int out_count = 0;
 
         // Gather messages from all handlers
-        MessagePtrList pub_msgs;
-        if (handlers_.begin() != handlers_.end())
+        BOOST_FOREACH(const HandlerMap::value_type& rh, handlers_)
         {
-            out_count += handlers_.begin()->second->assembleOutgoing(pub_msgs);
+            rh.second->sendOutgoing(publisher_);
         }
 
-        // Send all outgoing messages
-        BOOST_FOREACH(message_t* msg, pub_msgs)
-        {
-            publisher_->send(*msg);
-        }
     }
 
 // -----------------------------------------------------------------------------

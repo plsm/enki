@@ -36,9 +36,10 @@
 
 #include "WorldExt.h"
 #include "PlaygroundExt.h"
-#include "AssisiMessageHandler.h"
+#include "ext/handlers/EPuckHandler.h"
 
-using std::string;
+using namespace std;
+using namespace Enki;
 
 // http://qtnode.net/wiki?title=Qt_with_cmake
 int main(int argc, char *argv[])
@@ -49,10 +50,13 @@ int main(int argc, char *argv[])
     double r = 120; // World radius (in cm?)
     string pub_address("tcp://127.0.0.1:5555"); 
     string sub_address("tcp://127.0.0.1:5556");
-    Assisi::MessageHandler* msg_handler = new Assisi::MessageHandler;
-    Enki::WorldExt world(r, msg_handler, pub_address, sub_address);
-    Enki::EnkiPlayground viewer(&world);
-	
+    WorldExt world(r, pub_address, sub_address);
+    
+    // Add handlers
+    EPuckHandler *eh = new EPuckHandler();
+    world.addHandler("EPuck", eh);
+
+    EnkiPlayground viewer(&world);	
 	viewer.show();
 	
 	return app.exec();

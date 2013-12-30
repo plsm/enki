@@ -3,32 +3,33 @@
  */
 
 #include <zmq.hpp>
+#include "ext/zmq_helpers.h"
 
 #include "enki/robots/e-puck/EPuck.h"
 #include "ext/handlers/EPuckHandler.h"
 
 using zmq::message_t;
+using zmq::socket_t;
+using std::string;
 
 namespace Enki
 {
 
     /* virtual */
-    Robot* EPuckHandler::createRobot(message_t* in_msg)
+    string EPuckHandler::createRobot(socket_t* sock, World* world)
     {
-        if (epucks_.count("pero") > 0)
+        string name("");
+        if (epucks_.count("pero") < 1)
         {
-            // Robot already exists!
-            return NULL;
-        }
-        else
-        {
+            // Robot doesn't exist yet!
             epucks_["pero"] = new EPuck;
-            return epucks_["pero"];
+            world->addObject(epucks_["pero"]);
         }
+        return name;
     }
 
     /* virtual */
-    int EPuckHandler::handleIncoming(message_t* in_msg)
+    int EPuckHandler::handleIncoming(socket_t* sock, string name)
     {
         if (epucks_.begin() != epucks_.end())
         {
@@ -38,13 +39,18 @@ namespace Enki
     }
 
     /* virtual */
-    int EPuckHandler::assembleOutgoing(MessagePtrList& out_msgs)
+    int EPuckHandler::sendOutgoing(socket_t* sock)
     {
         int count = 1;
-        message_t* sens_msg = new message_t(12);
-        snprintf((char*) sens_msg->data(), 12, "sensor data");
+        message_t msg;
+        string header_str("EPuck");
+        string msg_str("sensor data");
+        str_to_msg(header_str, msg);
+        sock->send(msg, ZMQ_SNDMORE);
+        str_to_msg(msg_str, msg);
+        sock->send(msg);
+        //snprintf((char*) sens_msg.data(), 12, "sensor data");
         // memcpy((void *) sens_msg.data(), data.c_str(), data.length());
-        out_msgs.push_back(sens_msg);
         return count;
     }
 }

@@ -28,11 +28,6 @@ namespace Enki
         
     public:
 
-//! Enki world extened with a ZMQ-based external interface.
-    /*! 
-        
-     */
-
         //! Construct a world with walls of radius r, start communication.
         /*!
                                WorldExt takes ownership of the object 
@@ -65,8 +60,12 @@ it must be created on the heap and should not be deleted!
 
     private:
 
-        // Robot handlers
-        std::map<std::string, RobotHandler*> handlers_;
+        typedef std::map<std::string, RobotHandler*> HandlerMap;
+        // Robot handler pointer, one handler per robot type
+        HandlerMap handlers_;
+        // Pointers to handlers, grouped by object name
+        // All robots of the same type will point to the same handler
+        HandlerMap handlers_by_object_;
 
         // ZMQ connection data members
         std::string pub_address_;
