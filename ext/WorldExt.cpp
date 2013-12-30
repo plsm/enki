@@ -94,41 +94,7 @@ namespace Enki
             // This message "peeling" is quite a pain...
             if (target == "sim")
             {
-                if (!last_part(*subscriber_))
-                {
-                    // Read command
-                    subscriber_->recv(&msg);
-                    string sim_cmd = msg_to_str(msg);
-                    if (sim_cmd == "spawn")
-                    {
-                        // Command is spawn
-                        // Read command contents and spawn robot
-                        if (!last_part(*subscriber_))
-                        {
-                            subscriber_->recv(&msg);
-                            // TODO: Parse protobuf message here!
-                            string robot_type = "EPuck";
-                            if (handlers_.count(robot_type) > 0)
-                            {
-                                string name = handlers_[robot_type]->createRobot(subscriber_, this);
-                                if (name.length() > 0)
-                                {
-                                    // New robot was spawned
-                                    handlers_by_object_[name] = handlers_[robot_type];
-                                    subscriber_->setsockopt(ZMQ_SUBSCRIBE, name.c_str(), name.length());
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        cerr << "Unknown command to sim!" << std::endl;
-                    }
-                }
-                else
-                {
-                    cerr << "Missing message body for sim message!" << endl; 
-                }
+                handleSim_();
             }
             else if (handlers_by_object_.count(target) > 0)
             {
@@ -152,6 +118,51 @@ namespace Enki
             rh.second->sendOutgoing(publisher_);
         }
 
+    }
+
+// -----------------------------------------------------------------------------
+
+    bool WorldExt::handleSim_(void)
+    {
+        message_t msg;
+        if (!last_part(*subscriber_))
+        {
+            // Read command
+            subscriber_->recv(&msg);
+            string sim_cmd = msg_to_str(msg);
+            if (sim_cmd == "spawn")
+            {
+                // Command is spawn
+                // Read command contents and spawn robot
+                if (!last_part(*subscriber_))
+                {
+                    subscriber_->recv(&msg);
+                    // TODO: Parse protobuf message here!
+                    string robot_type = "EPuck";
+                    if (handlers_.count(robot_type) > 0)
+                    {
+                        string name = handlers_[robot_type]->createRobot(subscriber_, 
+                                                                         this);
+                        if (name.length() > 0)
+                        {
+                            // New robot was spawned
+                            handlers_by_object_[name] = handlers_[robot_type];
+                            subscriber_->setsockopt(ZMQ_SUBSCRIBE, 
+                                                    name.c_str(), 
+                                                    name.length());
+                        }
+                    }
+                }
+            }
+            else
+            {
+                cerr << "Unknown command to sim!" << std::endl;
+            }
+        }
+        else
+        {
+            cerr << "Missing message body for sim message!" << endl; 
+        }
     }
 
 // -----------------------------------------------------------------------------

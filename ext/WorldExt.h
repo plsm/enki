@@ -60,6 +60,12 @@ it must be created on the heap and should not be deleted!
 
     private:
 
+        //! Simulation command handling
+        /*!
+
+         */
+        bool handleSim_(void);
+
         typedef std::map<std::string, RobotHandler*> HandlerMap;
         // Robot handler pointer, one handler per robot type
         HandlerMap handlers_;
