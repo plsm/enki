@@ -4,17 +4,27 @@ find_package(ZeroMQ REQUIRED)
 # boost::for_each is used within WorldExt
 find_package(Boost REQUIRED)
 
+# Set up compilation of protobuffer files
+find_package(Protobuf REQUIRED)
+set(Proto_FILES messages/base_msgs.proto
+                  messages/sensor_msgs.proto)
+set(PROTOBUF_IMPORT_DIRS ${PROTOBUF_IMPORT_DIRS}
+                         ${enki_SOURCE_DIR}/ext/messages)
+PROTOBUF_GENERATE_CPP(ProtoSources ProtoHeaders ${Proto_FILES})
+
 set(test_ext_SOURCES WorldExt.cpp
                      handlers/EPuckHandler.cpp
-                     TestWorldExt.cpp)
+                     TestWorldExt.cpp
+                     ${ProtoSources})
 
 include_directories (${enki_SOURCE_DIR}
+                     ${enki_BINARY_DIR}
                      ${ZeroMQ_INCLUDE_DIR})
 
 link_directories (${enki_BINARY_DIR})
 
 add_executable(test_ext ${test_ext_SOURCES})
-target_link_libraries(test_ext enki ${ZeroMQ_LIBRARY})
+target_link_libraries(test_ext enki ${ZeroMQ_LIBRARY} ${PROTOBUF_LIBRARY})
 
 find_package(Qt4)
 
@@ -33,7 +43,8 @@ if (QT4_FOUND)
     set(playground_ext_SOURCES PlaygroundExtMain.cpp
                                handlers/EPuckHandler.cpp
                                PlaygroundExt.cpp
-                               WorldExt.cpp)
+                               WorldExt.cpp
+                               ${ProtoSources})
     
     # For MOC-ing
     set(ext_QT_HEADERS PlaygroundExt.h)
@@ -52,5 +63,6 @@ if (QT4_FOUND)
                                          enkiviewer
                                          ${QT_LIBRARIES} 
                                          ${OPENGL_LIBRARIES} 
-                                         ${ZeroMQ_LIBRARY})
+                                         ${ZeroMQ_LIBRARY}
+                                         ${PROTOBUF_LIBRARY})
 endif (QT4_FOUND)     

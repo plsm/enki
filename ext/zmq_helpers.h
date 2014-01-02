@@ -27,7 +27,7 @@ namespace zmq
     }
 
     //! Convert string to message data.
-    static void str_to_msg(std::string str, message_t& msg)
+    static void str_to_msg(const std::string& str, message_t& msg)
     {
         msg.rebuild(str.size());
         memcpy(msg.data(), str.data(), str.size());

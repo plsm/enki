@@ -1,0 +1,54 @@
+import "base_msgs.proto";
+
+package AssisiMsg;
+
+// All units are SI units.
+
+// An array of range sensor readings.
+// All sensors are assumed to be identical
+message RangeArray
+{
+  optional Header header = 1;
+
+  enum SensorType
+  {
+    IR = 0;
+  }
+
+  optional SensorType type = 2 [default = IR];
+  optional float field_of_view = 3 [default = 0.5236]; // Sensor reading is valid
+                                                       // between -field_of_view/2 
+                                                       // and field_of_view/2 [rad]
+                                                       // angle 0 is sensor x-axis
+                                                       // Default value is 30°
+
+  optional float min_range = 4 [default = 0]; // Values outside of [min_range, max_range]
+  optional float max_range = 5 [default = inf]; // should be discarded
+  repeated float range = 6;  
+
+  repeated float raw_value = 7; // Raw vale of the reflected signal
+  
+}
+
+message Temperature
+{
+  optional Header header = 1;
+  required float temp = 2;
+}
+
+message Vibration
+{
+  optional Header header = 1;
+  required float freq = 2;
+  required float amplitude = 3;
+}
+
+message Light
+{
+  optional Header header = 1;
+  required float r = 2;
+  required float g = 3;
+  required float b = 4;
+}
+
+

@@ -48,7 +48,8 @@ namespace Enki
         virtual int sendOutgoing(zmq::socket_t* sock);
 
     private:
-        std::map<std::string, EPuck*> epucks_;
+        typedef std::map<std::string, EPuck*> EPuckMap;
+        EPuckMap epucks_;
     };
 
 }

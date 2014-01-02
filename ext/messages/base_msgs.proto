@@ -1,0 +1,49 @@
+package AssisiMsg;
+
+// All units are SI units.
+// Angles are in radians.
+
+message Time
+{
+  // Seconds since the Epoch
+  required uint64 sec = 1;
+  // Nanoseconds since seconds
+  required uint64 nsec = 2;
+}
+
+message Header
+{
+  // Consecutively increasing ID
+  optional int32 id = 1;
+  // Message timestamp
+  optional Time stamp = 2;
+  // Frame ID (used for coordinate transforms)
+  optional string frame_id = 3;
+}
+
+message Point
+{
+  required double x = 1;
+  required double y = 2;
+  optional double z = 3 [default = 0];
+}
+
+message Quaternion
+{
+  optional double x = 1 [default = 0];
+  optional double y = 2 [default = 0];
+  required double z = 3;
+  optional double w = 4 [default = 1];
+}
+
+message Pose
+{
+  required Point position = 1;
+  required Quaternion orientation = 2;
+}
+
+message PoseStamped
+{
+  optional Header header = 1;
+  required Pose pose = 2;
+}
