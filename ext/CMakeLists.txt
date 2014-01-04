@@ -7,15 +7,12 @@ find_package(Boost REQUIRED)
 # Set up compilation of protobuffer files
 find_package(Protobuf REQUIRED)
 set(Proto_FILES messages/base_msgs.proto
-                  messages/sensor_msgs.proto)
+                messages/dev_msgs.proto
+                messages/sim_msgs.proto)
+
 set(PROTOBUF_IMPORT_DIRS ${PROTOBUF_IMPORT_DIRS}
                          ${enki_SOURCE_DIR}/ext/messages)
 PROTOBUF_GENERATE_CPP(ProtoSources ProtoHeaders ${Proto_FILES})
-
-set(test_ext_SOURCES WorldExt.cpp
-                     handlers/EPuckHandler.cpp
-                     TestWorldExt.cpp
-                     ${ProtoSources})
 
 include_directories (${enki_SOURCE_DIR}
                      ${enki_BINARY_DIR}
@@ -23,8 +20,21 @@ include_directories (${enki_SOURCE_DIR}
 
 link_directories (${enki_BINARY_DIR})
 
+# Demo world "server" (no GUI)
+set(test_ext_SOURCES WorldExt.cpp
+                     handlers/EPuckHandler.cpp
+                     TestWorldExt.cpp
+                     ${ProtoSources})
+
 add_executable(test_ext ${test_ext_SOURCES})
 target_link_libraries(test_ext enki ${ZeroMQ_LIBRARY} ${PROTOBUF_LIBRARY})
+
+# Demo EPuck wander behavior ("client")
+set(wander_demo_SOURCES wander_demo.cpp
+                        ${ProtoSources})
+
+add_executable(wander_demo ${wander_demo_SOURCES})
+target_link_libraries(wander_demo ${ZeroMQ_LIBRARY} ${PROTOBUF_LIBRARY})
 
 find_package(Qt4)
 
@@ -40,6 +50,7 @@ if (QT4_FOUND)
     	add_definitions("-fPIC")
     endif (CMAKE_HOST_UNIX)
 
+    # Demo world "server", with GUI
     set(playground_ext_SOURCES PlaygroundExtMain.cpp
                                handlers/EPuckHandler.cpp
                                PlaygroundExt.cpp

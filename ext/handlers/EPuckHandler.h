@@ -40,7 +40,7 @@ namespace Enki
         /*! Handles E-Puck motion commands.
 
          */
-        virtual int handleIncoming(zmq::socket_t* sock, std::string name);
+        virtual int handleIncoming(zmq::socket_t* sock, const std::string& name);
 
         //! Assemble outgoing messages
         /*! Sends E-Puck sensor data messages.

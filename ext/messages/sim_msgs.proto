@@ -1,0 +1,12 @@
+import "base_msgs.proto";
+
+package AssisiMsg;
+
+message Spawn
+{
+  optional Header header = 1;
+  required string type = 2; // Type of robot to spawn
+  required string name = 3; // Robot name
+  required Pose pose = 4;
+  optional Twist velocity = 5; // Currently ignored!
+}

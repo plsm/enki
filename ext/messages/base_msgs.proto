@@ -28,6 +28,13 @@ message Point
   optional double z = 3 [default = 0];
 }
 
+message Vector3
+{
+  required double x = 1;
+  required double y = 2;
+  required double z = 3 [default = 0];
+}
+
 message Quaternion
 {
   optional double x = 1 [default = 0];
@@ -46,4 +53,16 @@ message PoseStamped
 {
   optional Header header = 1;
   required Pose pose = 2;
+}
+
+message Twist
+{
+  required Vector3 linear = 1;
+  required Vector3 angular = 2;
+}
+
+message TwistStamped
+{
+  optional Header header = 1;
+  required Twist twist = 2;
 }

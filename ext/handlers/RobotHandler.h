@@ -43,7 +43,7 @@ namespace Enki
                       first part(s) peeled off.
 
          */
-        virtual int handleIncoming(zmq::socket_t* sock, std::string name) = 0;
+        virtual int handleIncoming(zmq::socket_t* sock, const std::string& name) = 0;
 
         //! Assemble outgoing messages
         /*! Override this method to create outgoing messages 

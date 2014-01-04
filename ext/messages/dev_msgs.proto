@@ -51,4 +51,9 @@ message Light
   required float b = 4;
 }
 
-
+message DiffDrive
+{
+  optional Header header = 1;
+  required double vel_left = 2;
+  required double vel_right = 3;
+}
