@@ -13,11 +13,18 @@
 namespace Enki
 {
 	/**
-	 * Represents a component of some robot or object.
+	 * Represents a component of some robot or object.  Provides common
+	 * functionality for sensors and actuators that are part of some robot.
+	 * These components' position is relative to the robot absolute
+	 * position.  The component absolute position is computed every
+	 * simulation step.
 	 */
 	class Component
 	{
 	public:
+		/**
+		 * The owner of this component.
+		 */
 		const PhysicalObject *owner;
 		/**
 		 * Position of this component relative to the centre of mass of the object.

@@ -12,6 +12,10 @@
 
 namespace Enki {
 
+	/**
+	 * A light source that emits from above and is not obscured by objects
+	 * in the world.  The light model is defined in http://larics.rasip.fer.hr/assisiwiki/doku.php?id=software:simulators
+	 */
 	class LightSourceFromAbove:
 		public LightSource
 	{

@@ -35,6 +35,9 @@ namespace Enki
 		LightSensor (double range, Enki::Robot* owner, Enki::Vector relativePosition, double wavelength);
 		LightSensor (const LightSensor& orig);
 		virtual ~LightSensor ();
+		/**
+		 *  Reset light intensity.  Called every {@code w->step()}.
+		 */
 		virtual void init (double dt, Enki::World* w);
 		/**
 		 * Interact with the given object only if it is a {@code LightSource}
