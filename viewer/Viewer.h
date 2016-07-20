@@ -1,6 +1,6 @@
 /*
     Enki - a fast 2D robot simulator
-    Copyright (C) 1999-2013 Stephane Magnenat <stephane at magnenat dot net>
+    Copyright (C) 1999-2016 Stephane Magnenat <stephane at magnenat dot net>
     Copyright (C) 2004-2005 Markus Waibel <markus dot waibel at epfl dot ch>
     Copyright (c) 2004-2005 Antoine Beyeler <abeyeler at ab-ware dot com>
     Copyright (C) 2005-2006 Laboratory of Intelligent Systems, EPFL, Lausanne
@@ -82,7 +82,20 @@ namespace Enki
 		public:
 			CustomRobotModel();
 		};
-	
+		
+		// Camera pose
+		struct CameraPose
+		{
+			QPointF pos; //!< (x,y) position of the camera
+			double altitude; //!< altitude (z) of the camera
+			double yaw; //!< yaw angle, mathematical orientation
+			double pitch; //!< pitch angle, negative looking down, positive looking up
+			
+			CameraPose(QPointF pos, double altitude, double yaw, double pitch);
+		};
+		
+		CameraPose camera; //!< current camera pose
+		
 	protected:
 		World *world;
 		
@@ -100,10 +113,6 @@ namespace Enki
 		
 		bool mouseGrabbed;
 		QPoint mouseGrabPos;
-		double yaw;
-		double pitch;
-		QPointF pos;
-		double altitude;
 		double wallsHeight;
 		
 		bool doDumpFrames;
@@ -114,6 +123,8 @@ namespace Enki
 		~ViewerWidget();
 	
 	public slots:
+		void setCamera(QPointF pos, double altitude, double yaw, double pitch);
+		void setCamera(double x, double y, double altitude, double yaw, double pitch);
 		void restartDumpFrames();
 		void setDumpFrames(bool doDump);
 		
@@ -123,6 +134,7 @@ namespace Enki
 		void renderSegment(const Segment& segment, double height);
 		void renderWorldSegment(const Segment& segment);
 		void renderWorld();
+		void renderShape(const Polygone& shape, const double height, const Color& color);
 		void renderSimpleObject(PhysicalObject *object);
 		virtual void renderObjectsTypesHook();
 		virtual void renderObjectHook(PhysicalObject *object);
